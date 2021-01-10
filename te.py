@@ -7,7 +7,7 @@ size = width, height = 500, 500
 screen = pygame.display.set_mode(size)
 all_sprites = pygame.sprite.Group()
 sprite = pygame.sprite.Sprite()
-pygame.mouse.set_visible(False)
+pygame.mouse.set_visible(True)
 
 
 def load_image(name, colorkey=None):
@@ -25,20 +25,28 @@ def load_image(name, colorkey=None):
         image = image.convert_alpha()
     return image
 
-sprite.image = load_image("arrow.png")
+
+sprite.image = load_image("creature.png")
 sprite.rect = sprite.image.get_rect()
 all_sprites.add(sprite)
 clock = pygame.time.Clock()
 tickrate = 60
+move = 10
+left = right = up = down = False
 running = True
 while running:
     for e in pygame.event.get():
         if e.type == pygame.QUIT:
             running = False
-    if pygame.mouse.get_focused():
-        pos = pygame.mouse.get_pos()
-        sprite.rect.x, sprite.rect.y = pos[0], pos[1]
-    screen.fill("black")
+        if e.type == pygame.KEYDOWN and e.key == pygame.K_LEFT:
+            sprite.rect.x -= move
+        if e.type == pygame.KEYDOWN and e.key == pygame.K_RIGHT:
+            sprite.rect.x += move
+        if e.type == pygame.KEYDOWN and e.key == pygame.K_UP:
+            sprite.rect.y -= move
+        if e.type == pygame.KEYDOWN and e.key == pygame.K_DOWN:
+            sprite.rect.y += move
+    screen.fill("white")
     all_sprites.draw(screen)
     pygame.display.flip()
     clock.tick(tickrate)
