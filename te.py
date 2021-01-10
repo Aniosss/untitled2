@@ -26,29 +26,34 @@ def load_image(name, colorkey=None):
     return image
 
 
-right = True
+class Car(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.right = True
+        self.image = load_image("car2.png")
+        self.rect = self.image.get_rect()
+        self.rect.x = self.rect.y = 0
+        self.size = self.image.get_size()
 
-
-def update():
-    global right
-    if right:
-        if mx + sprite.rect.x + move < 600:
-            sprite.rect.x += move
+    def update(self):
+        if self.right:
+            if self.size[0] + self.rect.x + move < 600:
+                self.rect.x += move
+            else:
+                self.image = pygame.transform.flip(self.image, True, False)
+                self.right = False
         else:
-            sprite.image = pygame.transform.flip(sprite.image, True, False)
-            right = False
-    else:
-        if sprite.rect.x - move > 0:
-            sprite.rect.x -= move
-        else:
-            sprite.image = pygame.transform.flip(sprite.image, True, False)
-            right = True
+            if self.rect.x - move > 0:
+                self.rect.x -= move
+            else:
+                self.image = pygame.transform.flip(self.image, True, False)
+                self.right = True
+
+    def draw(self, screen):
+        screen.blit(self.image, (self.rect.x, self.rect.y))
 
 
-sprite.image = load_image("car2.png")
-sprite.rect = sprite.image.get_rect()
-mx = sprite.image.get_size()[0]
-all_sprites.add(sprite)
+car = Car()
 clock = pygame.time.Clock()
 tickrate = 60
 move = 3
@@ -57,8 +62,8 @@ while running:
     for e in pygame.event.get():
         if e.type == pygame.QUIT:
             running = False
-    update()
     screen.fill("white")
-    all_sprites.draw(screen)
+    car.draw(screen)
+    car.update()
     pygame.display.flip()
     clock.tick(tickrate)
