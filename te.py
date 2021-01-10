@@ -3,7 +3,7 @@ import sys
 import pygame
 
 pygame.init()
-size = width, height = 500, 500
+size = width, height = 600, 95
 screen = pygame.display.set_mode(size)
 all_sprites = pygame.sprite.Group()
 sprite = pygame.sprite.Sprite()
@@ -26,26 +26,38 @@ def load_image(name, colorkey=None):
     return image
 
 
-sprite.image = load_image("creature.png")
+right = True
+
+
+def update():
+    global right
+    if right:
+        if mx + sprite.rect.x + move < 600:
+            sprite.rect.x += move
+        else:
+            sprite.image = pygame.transform.flip(sprite.image, True, False)
+            right = False
+    else:
+        if sprite.rect.x - move > 0:
+            sprite.rect.x -= move
+        else:
+            sprite.image = pygame.transform.flip(sprite.image, True, False)
+            right = True
+
+
+sprite.image = load_image("car2.png")
 sprite.rect = sprite.image.get_rect()
+mx = sprite.image.get_size()[0]
 all_sprites.add(sprite)
 clock = pygame.time.Clock()
 tickrate = 60
-move = 10
-left = right = up = down = False
+move = 3
 running = True
 while running:
     for e in pygame.event.get():
         if e.type == pygame.QUIT:
             running = False
-        if e.type == pygame.KEYDOWN and e.key == pygame.K_LEFT:
-            sprite.rect.x -= move
-        if e.type == pygame.KEYDOWN and e.key == pygame.K_RIGHT:
-            sprite.rect.x += move
-        if e.type == pygame.KEYDOWN and e.key == pygame.K_UP:
-            sprite.rect.y -= move
-        if e.type == pygame.KEYDOWN and e.key == pygame.K_DOWN:
-            sprite.rect.y += move
+    update()
     screen.fill("white")
     all_sprites.draw(screen)
     pygame.display.flip()
