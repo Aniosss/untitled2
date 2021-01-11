@@ -4,8 +4,9 @@ import pygame
 import random
 
 pygame.init()
-size = width, height = 500, 500
+size = width, height = 600, 300
 screen = pygame.display.set_mode(size)
+screen.fill("blue")
 all_sprites = pygame.sprite.Group()
 sprite = pygame.sprite.Sprite()
 pygame.mouse.set_visible(True)
@@ -27,40 +28,34 @@ def load_image(name, colorkey=None):
     return image
 
 
-class Bomb(pygame.sprite.Sprite):
-    image = load_image("bomb.png")
-    image_boom = load_image("boom.png")
+class go(pygame.sprite.Sprite):
+    image = load_image("gameover.png")
 
     def __init__(self, *group):
         pygame.sprite.Sprite.__init__(self)
         super().__init__(*group)
-        self.image = Bomb.image
+        self.image = go.image
         self.rect = self.image.get_rect()
-        self.rect.x = random.randrange(0, width-150)
-        self.rect.y = random.randrange(0, height-150)
+        self.rect.x = -600
+        self.rect.y = 0
+        self.speed = 200/60
 
-    def get_event(self, *args):
-        if args and args[0].type == pygame.MOUSEBUTTONDOWN and \
-                self.rect.collidepoint(args[0].pos):
-            self.image = self.image_boom
+    def update(self):
+        if self.rect.x + self.speed <= 0:
+            self.rect.x += self.speed
+        else:
+            self.rect.x = 0
 
-
-for _ in range(20):
-    Bomb(all_sprites)
-
-
+go(all_sprites)
 clock = pygame.time.Clock()
 tickrate = 60
-move = 3
 running = True
 while running:
     for e in pygame.event.get():
         if e.type == pygame.QUIT:
             running = False
-        if e.type == pygame.MOUSEBUTTONDOWN:
-            for bomb in all_sprites:
-                bomb.get_event(e)
-    screen.fill("white")
+    screen.fill("blue")
     all_sprites.draw(screen)
+    all_sprites.update()
     pygame.display.flip()
     clock.tick(tickrate)
