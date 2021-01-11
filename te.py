@@ -1,9 +1,10 @@
 import os
 import sys
 import pygame
+import random
 
 pygame.init()
-size = width, height = 600, 95
+size = width, height = 500, 500
 screen = pygame.display.set_mode(size)
 all_sprites = pygame.sprite.Group()
 sprite = pygame.sprite.Sprite()
@@ -26,34 +27,28 @@ def load_image(name, colorkey=None):
     return image
 
 
-class Car(pygame.sprite.Sprite):
-    def __init__(self):
+class Bomb(pygame.sprite.Sprite):
+    image = load_image("bomb.png")
+    image_boom = load_image("boom.png")
+
+    def __init__(self, *group):
         pygame.sprite.Sprite.__init__(self)
-        self.right = True
-        self.image = load_image("car2.png")
+        super().__init__(*group)
+        self.image = Bomb.image
         self.rect = self.image.get_rect()
-        self.rect.x = self.rect.y = 0
-        self.size = self.image.get_size()
+        self.rect.x = random.randrange(0, width-150)
+        self.rect.y = random.randrange(0, height-150)
 
-    def update(self):
-        if self.right:
-            if self.size[0] + self.rect.x + move < 600:
-                self.rect.x += move
-            else:
-                self.image = pygame.transform.flip(self.image, True, False)
-                self.right = False
-        else:
-            if self.rect.x - move > 0:
-                self.rect.x -= move
-            else:
-                self.image = pygame.transform.flip(self.image, True, False)
-                self.right = True
-
-    def draw(self, screen):
-        screen.blit(self.image, (self.rect.x, self.rect.y))
+    def get_event(self, *args):
+        if args and args[0].type == pygame.MOUSEBUTTONDOWN and \
+                self.rect.collidepoint(args[0].pos):
+            self.image = self.image_boom
 
 
-car = Car()
+for _ in range(20):
+    Bomb(all_sprites)
+
+
 clock = pygame.time.Clock()
 tickrate = 60
 move = 3
@@ -62,8 +57,10 @@ while running:
     for e in pygame.event.get():
         if e.type == pygame.QUIT:
             running = False
+        if e.type == pygame.MOUSEBUTTONDOWN:
+            for bomb in all_sprites:
+                bomb.get_event(e)
     screen.fill("white")
-    car.draw(screen)
-    car.update()
+    all_sprites.draw(screen)
     pygame.display.flip()
     clock.tick(tickrate)
